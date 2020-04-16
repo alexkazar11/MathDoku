@@ -113,7 +113,7 @@ public class Board extends Canvas {
             if (allowed.contains(keyEvent.getText())) {
                 setChosenCellValue(keyEvent);
             } else if (keyEvent.getCode() == KeyCode.BACK_SPACE) {
-                clearInsideCell();
+                clearCellValue();
             } else if (keyEvent.getCode() == KeyCode.RIGHT) {
                 moveToNextCell();
             } else if (keyEvent.getCode() == KeyCode.LEFT) {
@@ -201,7 +201,7 @@ public class Board extends Canvas {
     /**
      * Clears the value of the chosen Cell.
      */
-    private void clearInsideCell() {
+    public void clearCellValue() {
         if (chosenCell != null) {
             chosenCell.setValue(0);
             update();
@@ -213,10 +213,23 @@ public class Board extends Canvas {
      *
      * @param keyEvent The keyEvent that contains the value to be used
      */
-    public void setChosenCellValue(KeyEvent keyEvent) {
+    private void setChosenCellValue(KeyEvent keyEvent) {
         if (chosenCell != null) {
             setTextStrokeParameters(18);
             int value = Integer.parseInt(keyEvent.getText());
+            chosenCell.setValue(value);
+            update();
+        }
+    }
+
+    /**
+     * Sets the value to the chosen Cell.
+     *
+     * @param value The value to be used
+     */
+    public void setChosenCellValue(int value) {
+        if (chosenCell != null) {
+            setTextStrokeParameters(18);
             chosenCell.setValue(value);
             update();
         }

@@ -113,7 +113,7 @@ public class Menu extends Application {
         outsideVBox.setSpacing(70);
         outsideVBox.setPadding(new Insets(0, 0, 20, 0));
 
-        /* ------- Functionality Setup ------- */
+        /* ------- Functionality Setup (Event Handlers)  ------- */
 
         //When the Start button is pressed, opens Game in the same stage
         start.setOnAction(new EventHandler<ActionEvent>() {

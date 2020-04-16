@@ -9,10 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.util.Arrays;
@@ -77,20 +74,29 @@ public class Game extends Application {
         Button showMistakes = new Button("Show Mistakes");
         Button clear = new Button("Clear");
 
+        //Creating side numpad buttons
+        Button buttonNum1 = new Button("1");
+        Button buttonNum2 = new Button("2");
+        Button buttonNum3 = new Button("3");
+        Button buttonNum4 = new Button("4");
+        Button buttonNum5 = new Button("5");
+        Button buttonNum6 = new Button("6");
+        Button buttonNum7 = new Button("7");
+        Button buttonNum8 = new Button("8");
+        Button buttonNumX = new Button("X");
+
         //Setting up button sizes and alignment
-        Button[] buttons = new Button[]{undo, redo, showMistakes, clear};
+        Button[] buttons = new Button[]{undo, redo, showMistakes, clear,
+                buttonNum1, buttonNum2, buttonNum3, buttonNum4,
+                buttonNum5, buttonNum6, buttonNum7, buttonNum8, buttonNumX};
         for (Button button : buttons) {
             button.setAlignment(Pos.CENTER);
             button.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(button, Priority.ALWAYS);
+            button.setFocusTraversable(false);
         }
 
         //Setting up default focus on Board(Canvas) to read keyboard inputs
-        undo.setFocusTraversable(false);
-        redo.setFocusTraversable(false);
-        clear.setFocusTraversable(false);
-        showMistakes.setFocusTraversable(false);
-        menuBar.setFocusTraversable(false);
         board.setFocusTraversable(true);
         board.requestFocus();
 
@@ -101,12 +107,36 @@ public class Game extends Application {
         hBox.setPadding(new Insets(10, 10, 10, 10));
         hBox.getChildren().addAll(undo, redo, showMistakes, clear);
 
+        //VBox NumPad creating & aligning
+        Button[] numPad = new Button[]{buttonNum1, buttonNum2, buttonNum3, buttonNum4,
+                buttonNum5, buttonNum6, buttonNum7, buttonNum8};
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setSpacing(10);
+        vBox.setPadding(new Insets(10, 10, 10, 10));
+        vBox.getChildren().addAll(buttonNum1, buttonNum2, buttonNum3,
+                buttonNum4, buttonNum5, buttonNum6, buttonNum7, buttonNum8, buttonNumX);
+
         //Placing elements on the borderPane
         borderPane.setCenter(pane);
         borderPane.setTop(menuBar);
         borderPane.setBottom(hBox);
+        borderPane.setRight(vBox);
 
-        /* ------- Functionality Setup ------- */
+        /* ------- Functionality Setup (Event Handlers) ------- */
+        //Disables buttons, which can't be used according to the rules of the game
+        //When buttons are pressed, the number is added to the Cell value
+        for (int i = 0; i < numPad.length; i++) {
+            if (i > boardSize - 1) {
+                numPad[i].setDisable(true);
+            }
+            int finalI = i;
+            numPad[i].setOnAction(actionEvent -> board.setChosenCellValue(finalI + 1));
+        }
+
+        //When X button is pressed, clears the chosen Cell value;
+        buttonNumX.setOnAction(actionEvent -> board.clearCellValue());
+
         //When back to menu is pressed opens Menu in the same stage
         backToMenu.setOnAction(actionEvent -> {
             Menu menu = new Menu();
@@ -146,8 +176,8 @@ public class Game extends Application {
         board.setOnKeyPressed(board::validateKeyboardInput);
 
         //Stage setup
-        stage.setMinHeight(300);
-        stage.setMinWidth(300);
+        stage.setMinHeight(435);
+        stage.setMinWidth(350);
         stage.setResizable(true);
         stage.setTitle("MathDoku");
         stage.setScene(new Scene(borderPane, 400, 435));
