@@ -10,11 +10,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
+
+import java.util.Arrays;
 
 /**
  * MathDoku Game rules:
@@ -29,6 +32,7 @@ public class Game extends Application {
 
     private int boardSize;
     private int difficulty;
+    private Cell[] listOfCells;
 
     /**
      * Creates a new Game
@@ -46,6 +50,8 @@ public class Game extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        /* ------- Visual Elements Setup ------- */
+
         //Board (Canvas) setup
         Board board = new Board(boardSize);
 
@@ -87,15 +93,16 @@ public class Game extends Application {
         hBox.setAlignment(Pos.CENTER);
         hBox.setSpacing(10);
         hBox.setPadding(new Insets(10, 10, 10, 10));
-        hBox.getChildren().addAll(undo, redo, clear, showMistakes);
+        hBox.getChildren().addAll(undo, redo, showMistakes, clear);
 
         //Placing elements on the borderPane
         borderPane.setCenter(pane);
         borderPane.setTop(menuBar);
         borderPane.setBottom(hBox);
 
-
         /* ------- Functionality Setup ------- */
+        //Generates a list of Cells
+        generateCells(boardSize);
 
         //When back to menu is pressed opens Menu in the same stage
         backToMenu.setOnAction(new EventHandler<ActionEvent>() {
@@ -119,10 +126,51 @@ public class Game extends Application {
             }
         });
 
+        //When Mouse is clicked on the Board, finds appropriate Cell and highlights it
+        board.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                int x = (int) (mouseEvent.getX() / board.getCellWidth());
+                int y = (int) (mouseEvent.getY() / board.getCellHeight());
+
+                int[] chosenXY = new int[]{x, y};
+
+                System.out.println(x + ", " + y);
+                Cell cell;
+                for (Cell listOfCell : listOfCells) {
+                    if (Arrays.equals(listOfCell.getCoordinates(), chosenXY)) {
+                        cell = listOfCell;
+                        System.out.println(cell.toString());
+                        board.chooseBox(cell);
+                        break;
+                    }
+                }
+            }
+        });
+
         //Stage setup
+        stage.setMinHeight(300);
+        stage.setMinWidth(300);
         stage.setResizable(true);
         stage.setTitle("MathDoku");
         stage.setScene(new Scene(borderPane, 400, 435));
         stage.show();
+    }
+
+    /**
+     * Iteratively creates Cells and
+     * fills the ArrayList with those Cells
+     *
+     * @param boardSize The number of Cells in each row/column
+     */
+    private void generateCells(int boardSize) {
+        listOfCells = new Cell[boardSize * boardSize];
+        int cellID = 0;
+        for (int y = 0; y < boardSize; y++) {
+            for (int x = 0; x < boardSize; x++) {
+                cellID++;
+                listOfCells[cellID - 1] = new Cell(cellID, 0, new int[]{x, y});
+            }
+        }
     }
 }
