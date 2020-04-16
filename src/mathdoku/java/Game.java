@@ -1,6 +1,7 @@
 package mathdoku.java;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -62,7 +63,8 @@ public class Game extends Application {
         javafx.scene.control.Menu help = new javafx.scene.control.Menu("Help");
         MenuItem backToMenu = new MenuItem("Back to Menu");
         MenuItem preferences = new MenuItem("Options");
-        file.getItems().addAll(backToMenu, preferences);
+        MenuItem quit = new MenuItem("Quit");
+        file.getItems().addAll(backToMenu, preferences, quit);
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(file, help);
 
@@ -105,6 +107,15 @@ public class Game extends Application {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        //When Quit is pressed quits the game
+        quit.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Platform.exit();
+                System.exit(0);
             }
         });
 

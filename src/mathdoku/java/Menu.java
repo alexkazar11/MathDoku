@@ -1,6 +1,7 @@
 package mathdoku.java;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -92,7 +93,8 @@ public class Menu extends Application {
         javafx.scene.control.Menu help = new javafx.scene.control.Menu("Help");
         MenuItem loadFromFile = new MenuItem("Load from file");
         MenuItem loadFromInput = new MenuItem("Load from text input");
-        file.getItems().addAll(loadFromFile, loadFromInput);
+        MenuItem quit = new MenuItem("Quit");
+        file.getItems().addAll(loadFromFile, loadFromInput, quit);
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(file, help);
 
@@ -141,6 +143,15 @@ public class Menu extends Application {
                     errorAlert.showAndWait();
                 }
 
+            }
+        });
+
+        //When Quit is pressed quits the game
+        quit.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Platform.exit();
+                System.exit(0);
             }
         });
 
