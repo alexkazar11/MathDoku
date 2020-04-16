@@ -2,8 +2,6 @@ package mathdoku.java;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -32,10 +30,9 @@ public class Game extends Application {
 
     private int boardSize;
     private int difficulty;
-    private Cell[] listOfCells;
 
     /**
-     * Creates a new Game
+     * Creates a new Game.
      *
      * @param stage      Stage where the Game is
      * @param boardSize  Size of the Square Board NxN as N (from 2 to 8)
@@ -88,6 +85,15 @@ public class Game extends Application {
             HBox.setHgrow(button, Priority.ALWAYS);
         }
 
+        //Setting up default focus on Board(Canvas) to read keyboard inputs
+        undo.setFocusTraversable(false);
+        redo.setFocusTraversable(false);
+        clear.setFocusTraversable(false);
+        showMistakes.setFocusTraversable(false);
+        menuBar.setFocusTraversable(false);
+        board.setFocusTraversable(true);
+        board.requestFocus();
+
         //HBox "toolbar" creating & aligning
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER);
@@ -101,52 +107,43 @@ public class Game extends Application {
         borderPane.setBottom(hBox);
 
         /* ------- Functionality Setup ------- */
-        //Generates a list of Cells
-        generateCells(boardSize);
-
         //When back to menu is pressed opens Menu in the same stage
-        backToMenu.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Menu menu = new Menu();
-                try {
-                    menu.start(stage);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        backToMenu.setOnAction(actionEvent -> {
+            Menu menu = new Menu();
+            try {
+                menu.start(stage);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
 
         //When Quit is pressed quits the game
-        quit.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Platform.exit();
-                System.exit(0);
-            }
+        quit.setOnAction(actionEvent -> {
+            Platform.exit();
+            System.exit(0);
         });
 
         //When Mouse is clicked on the Board, finds appropriate Cell and highlights it
-        board.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                int x = (int) (mouseEvent.getX() / board.getCellWidth());
-                int y = (int) (mouseEvent.getY() / board.getCellHeight());
+        board.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
+            int x = (int) (mouseEvent.getX() / board.getCellWidth());
+            int y = (int) (mouseEvent.getY() / board.getCellHeight());
 
-                int[] chosenXY = new int[]{x, y};
+            int[] chosenXY = new int[]{x, y};
 
-                System.out.println(x + ", " + y);
-                Cell cell;
-                for (Cell listOfCell : listOfCells) {
-                    if (Arrays.equals(listOfCell.getCoordinates(), chosenXY)) {
-                        cell = listOfCell;
-                        System.out.println(cell.toString());
-                        board.chooseBox(cell);
-                        break;
-                    }
+            System.out.println(x + ", " + y);
+            Cell cell;
+            for (Cell listOfCell : board.getListOfCells()) {
+                if (Arrays.equals(listOfCell.getCoordinates(), chosenXY)) {
+                    cell = listOfCell;
+                    System.out.println(cell.toString());
+                    board.chooseBox(cell);
+                    break;
                 }
             }
         });
+
+        //When a key is pressed it's saved in a variable and the board is updated
+        board.setOnKeyPressed(board::validateKeyboardInput);
 
         //Stage setup
         stage.setMinHeight(300);
@@ -157,20 +154,5 @@ public class Game extends Application {
         stage.show();
     }
 
-    /**
-     * Iteratively creates Cells and
-     * fills the ArrayList with those Cells
-     *
-     * @param boardSize The number of Cells in each row/column
-     */
-    private void generateCells(int boardSize) {
-        listOfCells = new Cell[boardSize * boardSize];
-        int cellID = 0;
-        for (int y = 0; y < boardSize; y++) {
-            for (int x = 0; x < boardSize; x++) {
-                cellID++;
-                listOfCells[cellID - 1] = new Cell(cellID, 0, new int[]{x, y});
-            }
-        }
-    }
+
 }

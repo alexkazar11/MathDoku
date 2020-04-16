@@ -147,12 +147,9 @@ public class Menu extends Application {
         });
 
         //When Quit is pressed quits the game
-        quit.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Platform.exit();
-                System.exit(0);
-            }
+        quit.setOnAction(actionEvent -> {
+            Platform.exit();
+            System.exit(0);
         });
 
         //Stage setup
@@ -163,7 +160,7 @@ public class Menu extends Application {
     }
 
     /**
-     * Transforms the difficulty chosen by the user from String to int
+     * Transforms the difficulty chosen by the user from String to int.
      * null -> 0
      * "Easy" -> 1
      * "Medium" -> 2
@@ -195,7 +192,7 @@ public class Menu extends Application {
     }
 
     /**
-     * Transforms the difficulty chosen by the user from String to int
+     * Transforms the difficulty chosen by the user from String to int.
      * null -> 0
      * "2x2" -> 2
      * "3x3" -> 3
