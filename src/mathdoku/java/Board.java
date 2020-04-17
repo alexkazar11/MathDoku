@@ -450,27 +450,27 @@ public class Board extends Canvas {
     private void loadDefaultGame() throws IOException {
         switch (size) {
             case 2: {
-                readFile("src/mathdoku/resources/puzzles/2x2.txt");
+                readFile("src/mathdoku/resources/puzzles/size2x2/2x2.txt");
                 break;
             }
             case 3: {
-                readFile("src/mathdoku/resources/puzzles/3x3.txt");
+                readFile("src/mathdoku/resources/puzzles/size3x3/3x3.txt");
                 break;
             }
             case 4: {
-                readFile("src/mathdoku/resources/puzzles/4x4.txt");
+                readFile("src/mathdoku/resources/puzzles/size4x4/4x4_divdiff.txt");
                 break;
             }
             case 5: {
-                readFile("src/mathdoku/resources/puzzles/5x5.txt");
+                readFile("src/mathdoku/resources/puzzles/size5x5/5x5.txt");
                 break;
             }
             case 6: {
-                readFile("src/mathdoku/resources/puzzles/6x6.txt");
+                readFile("src/mathdoku/resources/puzzles/size6x6/6x6.txt");
                 break;
             }
             case 7: {
-                readFile("src/mathdoku/resources/puzzles/7x7.txt");
+                readFile("src/mathdoku/resources/puzzles/size7x7/7x7.txt");
                 break;
             }
             case 8: {
