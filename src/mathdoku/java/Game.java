@@ -162,7 +162,7 @@ public class Game extends Application {
 
             System.out.println(x + ", " + y);
             Cell cell;
-            for (Cell listOfCell : board.getListOfCells()) {
+            for (Cell listOfCell : board.getArrayOfCells()) {
                 if (Arrays.equals(listOfCell.getCoordinates(), chosenXY)) {
                     cell = listOfCell;
                     System.out.println(cell.toString());
@@ -177,7 +177,7 @@ public class Game extends Application {
 
         //Stage setup
         stage.setMinHeight(435);
-        stage.setMinWidth(350);
+        stage.setMinWidth(400);
         stage.setResizable(true);
         stage.setTitle("MathDoku");
         stage.setScene(new Scene(borderPane, 400, 435));
