@@ -2,6 +2,7 @@ package mathdoku.java;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * MathDoku Cells are grouped in Cages (which can be of any size ranging from 1 to NxN,
@@ -26,6 +27,76 @@ public class Cage {
         this.size = cells.size();
     }
 
+    /**
+     * Checks the cage, if it follows the target rule correctly.
+     *
+     * @return true - if cage is correct or empty, false - if there is a mistake
+     */
+    public boolean checkCage() {
+        if (isEmpty()) {
+            return true;
+        }
+
+        if (target.length() == 1) {
+            return Integer.parseInt(target) == cells.get(0).getValue();
+        }
+
+        int multiplierInt = Integer.parseInt(target.substring(0, target.length() - 1));
+        String multiplierSign = target.substring(target.length() - 1);
+        switch (multiplierSign) {
+            case "+": {
+                int total = 0;
+                for (Cell cell : cells) {
+                    total = total + cell.getValue();
+                }
+                return total == multiplierInt;
+
+            }
+            case "x": {
+                int total = 1;
+                for (Cell cell : cells) {
+                    total = total * cell.getValue();
+                }
+                return total == multiplierInt;
+
+            }
+            case "-": {
+                int total = 0;
+                List<Cell> cellsSorted = new ArrayList<Cell>(cells);
+                cellsSorted.sort(Cell::compareTo);
+                int largest = cellsSorted.get(0).getValue();
+                total = total + largest;
+
+                for (int i = 1; i < cellsSorted.size(); i++) {
+                    total = total - cellsSorted.get(i).getValue();
+                }
+
+                return total == multiplierInt;
+            }
+
+            case "÷":
+            case "/": {
+                int total = 0;
+
+                List<Cell> cellsSorted = new ArrayList<Cell>(cells);
+                cellsSorted.sort(Cell::compareTo);
+                int largest = cellsSorted.get(0).getValue();
+                total = total + largest;
+
+                for (int i = 1; i < cellsSorted.size(); i++) {
+                    if (cellsSorted.get(i).getValue() == 0) {
+                        return false;
+                    }
+                    total = total / cellsSorted.get(i).getValue();
+                }
+
+                return total == multiplierInt;
+            }
+        }
+        return false;
+    }
+
+
     @Override
     public String toString() {
         return "Cage{" +
@@ -49,5 +120,14 @@ public class Cage {
 
     public ArrayList<Cell> getCells() {
         return cells;
+    }
+
+    private boolean isEmpty() {
+        for (Cell cell : cells) {
+            if (cell.getValue() != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

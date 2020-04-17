@@ -162,6 +162,9 @@ public class Game extends Application {
             }
         });
 
+        //When Show Mistakes toggle is pressed starts highlighting mistakes red
+        showMistakes.setOnAction(e -> board.mistakes());
+
         //When Mouse is clicked on the Board, finds appropriate Cell and highlights it
         board.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
             int x = (int) (mouseEvent.getX() / board.getCellWidth());

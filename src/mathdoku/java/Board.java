@@ -3,6 +3,7 @@ package mathdoku.java;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
@@ -12,8 +13,7 @@ import javafx.scene.text.TextAlignment;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Board is a square grid of a size NxN.
@@ -28,6 +28,7 @@ public class Board extends Canvas {
     private Cell[] arrayOfCells;
     private ArrayList<String> allowed;
     private ArrayList<Cage> cages = new ArrayList<>();
+    private boolean mistakesMode = false;
 
     public Board(int size) throws IOException {
         this.size = size;
@@ -55,8 +56,17 @@ public class Board extends Canvas {
         drawGrid(size);
         drawCages();
         showValues();
+
         if (chosenCell != null) {
             chooseBox(chosenCell);
+        }
+
+        if (checkGame()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("YOU WON!");
+            alert.setHeaderText("CONGRATULATIONS!");
+            alert.setContentText("You won the game, neat! Try another one!");
+            alert.showAndWait();
         }
     }
 
@@ -73,8 +83,15 @@ public class Board extends Canvas {
         this.cellHeight = height / size;
 
         gc.clearRect(0, 0, width, height);
-        gc.setLineWidth(4);
 
+        //If the mistakes mode is on, checks and highlights Cells with mistakes
+        if (mistakesMode) {
+            //checkRows(true);
+            //checkCols(true);
+            checkCages(true);
+        }
+
+        gc.setLineWidth(4);
         gc.strokeRect(0, 0, width, height);
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
@@ -378,7 +395,7 @@ public class Board extends Canvas {
      */
     private void drawCageLabels(Cage cage) {
         //Sorts the cage to find the first Cell of the Cage
-        List<Cell> cellsSorted = new ArrayList<Cell>(cage.getCells());
+        List<Cell> cellsSorted = new ArrayList<>(cage.getCells());
         cellsSorted.sort(cage.getComparator());
         Cell firstCell = cellsSorted.get(0);
         double cageStartY = firstCell.getCoordinates()[1] * cellHeight;
@@ -541,6 +558,149 @@ public class Board extends Canvas {
         for (int i = 0; i < size; i++) {
             allowed.add(Integer.toString(i + 1));
         }
+    }
+
+    /**
+     * Checks if the puzzle is fully and correctly completed.
+     *
+     * @return true - puzzle is fully and correctly completed, false otherwise
+     */
+    private boolean checkGame() {
+        for (Cell cell : arrayOfCells) {
+            if (cell.getValue() == 0) {
+                return false;
+            }
+        }
+        return checkCages(false)
+                && checkRows(false)
+                && checkCols(false);
+    }
+
+    /**
+     * Checks rows to be correctly filled.
+     *
+     * @param toHighlight If true - will highlight rows with mistakes, false - won't highlight
+     * @return true - If rows are correctly filled, false - otherwise
+     */
+    private boolean checkRows(boolean toHighlight) {
+        boolean correct = true;
+        for (int i = 0; i < arrayOfCells.length; i = i + size) {
+            Cell[] row = Arrays.copyOfRange(arrayOfCells, i, i + size);
+            if (findDuplicates(row)) {
+                if (toHighlight) {
+                    highlightRow(i);
+                }
+                correct = false;
+            }
+        }
+        return correct;
+    }
+
+    /**
+     * Checks columns to be correctly filled.
+     *
+     * @param toHighlight If true - will highlight columns with mistakes, false - won't highlight
+     * @return true - If columns are correctly filled, false - otherwise
+     */
+    private boolean checkCols(boolean toHighlight) {
+        boolean correct = true;
+        for (int i = 0; i < size; i++) {
+            Cell[] col = new Cell[size];
+            int j = 0; //position in a col
+            for (int k = 0; k < arrayOfCells.length; k = k + size) {
+                col[j] = arrayOfCells[i + k];
+                j++;
+            }
+            if (findDuplicates(col)) {
+                if (toHighlight) {
+                    highlightCol(i);
+                }
+                correct = false;
+            }
+        }
+        return correct;
+
+    }
+
+    /**
+     * Checks Cages to be correctly filled.
+     *
+     * @param toHighlight If true - will highlight Cages with mistakes, false - won't highlight
+     * @return true - If Cages are correctly filled, false - otherwise
+     */
+    private boolean checkCages(boolean toHighlight) {
+        boolean correct = true;
+        for (Cage cage : cages) {
+            if (!cage.checkCage()) {
+                if (toHighlight) {
+                    highlightCage(cage);
+                }
+                correct = false;
+            }
+        }
+        return correct;
+    }
+
+    /**
+     * Highlights a row pink, from a given first Cell.
+     *
+     * @param indexOfFirstCell The first cell of the row
+     */
+    private void highlightRow(int indexOfFirstCell) {
+        gc.setFill(Color.LIGHTPINK);
+        gc.fillRect(arrayOfCells[indexOfFirstCell].getCoordinates()[0] * cellWidth,
+                arrayOfCells[indexOfFirstCell].getCoordinates()[1] * cellHeight, cellWidth * size, cellHeight);
+
+    }
+
+    /**
+     * Highlights a column pink, from a given first Cell.
+     *
+     * @param indexOfFirstCell The first cell of the column
+     */
+    private void highlightCol(int indexOfFirstCell) {
+        gc.setFill(Color.LIGHTPINK);
+        gc.fillRect(arrayOfCells[indexOfFirstCell].getCoordinates()[0] * cellWidth,
+                arrayOfCells[indexOfFirstCell].getCoordinates()[1] * cellHeight, cellWidth, cellHeight * size);
+    }
+
+    /**
+     * Highlights a Cage pink.
+     *
+     * @param cage The Cage to be highlighted
+     */
+    private void highlightCage(Cage cage) {
+        gc.setFill(Color.LIGHTPINK);
+        for (Cell cell : cage.getCells()) {
+            gc.fillRect(cell.getCoordinates()[0] * cellWidth,
+                    cell.getCoordinates()[1] * cellHeight, cellWidth, cellHeight);
+        }
+
+    }
+
+    /**
+     * Travers an array of Cells and finds duplicates.
+     *
+     * @param cells An array of Cells to be traversed.
+     * @return true - if duplicates are found, false otherwise
+     */
+    private boolean findDuplicates(Cell[] cells) {
+        Set<Integer> lump = new HashSet<>();
+        for (Cell cell : cells) {
+            if (lump.contains(cell.getValue()) && cell.getValue() != 0) {
+                return true;
+            }
+            lump.add(cell.getValue());
+        }
+        return false;
+    }
+
+    /**
+     * Toggles the mistake mode.
+     */
+    public void mistakes() {
+        mistakesMode = !mistakesMode;
+        update();
     }
 
     public Cell[] getArrayOfCells() {
