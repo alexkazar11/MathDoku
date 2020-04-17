@@ -29,6 +29,7 @@ public class Board extends Canvas {
     private ArrayList<String> allowed;
     private ArrayList<Cage> cages = new ArrayList<>();
     private boolean mistakesMode = false;
+    private boolean gameOver = false;
 
     public Board(int size) throws IOException {
         this.size = size;
@@ -61,12 +62,13 @@ public class Board extends Canvas {
             chooseBox(chosenCell);
         }
 
-        if (checkGame()) {
+        if (checkGame() && !gameOver) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("YOU WON!");
             alert.setHeaderText("CONGRATULATIONS!");
             alert.setContentText("You won the game, neat! Try another one!");
             alert.showAndWait();
+            gameOver = true;
         }
     }
 
@@ -474,7 +476,7 @@ public class Board extends Canvas {
                 break;
             }
             case 8: {
-                readFile("src/mathdoku/resources/puzzles/8x8.txt");
+                readFile("src/mathdoku/resources/puzzles/size8x8/8x8.txt");
                 break;
             }
         }
