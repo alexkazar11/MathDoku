@@ -4,8 +4,6 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -116,34 +114,31 @@ public class Menu extends Application {
         /* ------- Functionality Setup (Event Handlers)  ------- */
 
         //When the Start button is pressed, opens Game in the same stage
-        start.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                int boardSize = 0;
-                int difficulty = 0;
+        start.setOnAction(actionEvent -> {
+            int boardSize = 0;
+            int difficulty = 0;
 
-                //Gets the values chosen by the user from the ComboBoxes
-                boardSize = getBoardSize(boardSizeBox);
-                difficulty = getDifficulty(difficultyBox);
+            //Gets the values chosen by the user from the ComboBoxes
+            boardSize = getBoardSize(boardSizeBox);
+            difficulty = getDifficulty(difficultyBox);
 
-                //Checks whether both ComboBoxes have something chosen
-                if (boardSize != 0 && difficulty != 0) {
-                    try {
-                        //Starts the Game with the chosen difficulty and boarder size
-                        Game game = new Game(stage, boardSize, difficulty);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    //If the ComboBoxes are empty - the error message is shown
-                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                    errorAlert.setHeaderText("Input not valid");
-                    errorAlert.setContentText(
-                            "You have to choose one of the options for the board size and difficulty level!");
-                    errorAlert.showAndWait();
+            //Checks whether both ComboBoxes have something chosen
+            if (boardSize != 0 && difficulty != 0) {
+                try {
+                    //Starts the Game with the chosen difficulty and boarder size
+                    Game game = new Game(stage, boardSize, difficulty);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
+            } else {
+                //If the ComboBoxes are empty - the error message is shown
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setHeaderText("Input not valid");
+                errorAlert.setContentText(
+                        "You have to choose one of the options for the board size and difficulty level!");
+                errorAlert.showAndWait();
             }
+
         });
 
         //When Quit is pressed quits the game

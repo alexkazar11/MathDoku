@@ -88,6 +88,18 @@ public class Board extends Canvas {
     }
 
     /**
+     * Clears the board.
+     */
+    public void clear() {
+        chosenCell = null;
+        for (Cell cell :
+                arrayOfCells) {
+            cell.setValue(0);
+        }
+        update();
+    }
+
+    /**
      * Clears the currently chosen Cell.
      */
     private void clearChosenCell() {
@@ -116,8 +128,6 @@ public class Board extends Canvas {
      */
     public void validateKeyboardInput(KeyEvent keyEvent) {
         if (keyEvent != null) {
-            System.out.println(keyEvent.getText());
-
             if (allowed.contains(keyEvent.getText())) {
                 setChosenCellValue(keyEvent);
             } else if (keyEvent.getCode() == KeyCode.BACK_SPACE) {
@@ -530,10 +540,6 @@ public class Board extends Canvas {
         allowed = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             allowed.add(Integer.toString(i + 1));
-        }
-        for (String s :
-                allowed) {
-            System.out.println(s);
         }
     }
 

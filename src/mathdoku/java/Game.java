@@ -5,14 +5,13 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * MathDoku Game rules:
@@ -151,6 +150,16 @@ public class Game extends Application {
         quit.setOnAction(actionEvent -> {
             Platform.exit();
             System.exit(0);
+        });
+
+        //When Clear is pressed pops up a window asking to confirm the action
+        clear.setOnAction(actionEvent -> {
+            Alert clearAlert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "Are you sure you want to clear the board?");
+            Optional<ButtonType> result = clearAlert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                board.clear();
+            }
         });
 
         //When Mouse is clicked on the Board, finds appropriate Cell and highlights it
