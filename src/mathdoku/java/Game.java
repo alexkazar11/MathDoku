@@ -26,6 +26,9 @@ public class Game extends Application {
 
     private int boardSize;
     private int difficulty;
+    private Board board;
+    private Button undo = new Button("Undo");
+    private Button redo = new Button("Redo");
 
     /**
      * Creates a new Game.
@@ -46,7 +49,7 @@ public class Game extends Application {
         /* ------- Visual Elements Setup ------- */
 
         //Board (Canvas) setup
-        Board board = new Board(boardSize);
+        this.board = new Board(boardSize, this);
 
         //Panes setup (wrapping Board inside Pane)
         BorderPane borderPane = new BorderPane();
@@ -68,8 +71,6 @@ public class Game extends Application {
         menuBar.getMenus().addAll(file, help);
 
         //Creating Buttons
-        Button undo = new Button("Undo");
-        Button redo = new Button("Redo");
         Button showMistakes = new Button("Show Mistakes");
         Button clear = new Button("Clear");
 
@@ -130,7 +131,7 @@ public class Game extends Application {
                 numPad[i].setDisable(true);
             }
             int finalI = i;
-            numPad[i].setOnAction(actionEvent -> board.setChosenCellValue(finalI + 1));
+            numPad[i].setOnAction(actionEvent -> board.setCellValue(board.getChosenCell(), finalI + 1));
         }
 
         //When X button is pressed, clears the chosen Cell value;
@@ -165,19 +166,22 @@ public class Game extends Application {
         //When Show Mistakes toggle is pressed starts highlighting mistakes red
         showMistakes.setOnAction(e -> board.mistakes());
 
+        //When undo is pressed, cancels the last action
+        undo.setOnAction(e -> board.undo());
+
+        //When redo is pressed, return back the last undone action
+        redo.setOnAction(e -> board.redo());
+
         //When Mouse is clicked on the Board, finds appropriate Cell and highlights it
         board.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
             int x = (int) (mouseEvent.getX() / board.getCellWidth());
             int y = (int) (mouseEvent.getY() / board.getCellHeight());
-
             int[] chosenXY = new int[]{x, y};
 
-            System.out.println(x + ", " + y);
             Cell cell;
             for (Cell listOfCell : board.getArrayOfCells()) {
                 if (Arrays.equals(listOfCell.getCoordinates(), chosenXY)) {
                     cell = listOfCell;
-                    System.out.println(cell.toString());
                     board.chooseBox(cell);
                     break;
                 }
@@ -196,5 +200,20 @@ public class Game extends Application {
         stage.show();
     }
 
-
+    /**
+     * Disables/Enables undo and redo buttons,
+     * depending on stacks being empty/non-empty
+     */
+    public void disableUndoRedo() {
+        if (board.isPossibleToUndo()) {
+            undo.setDisable(false);
+        } else {
+            undo.setDisable(true);
+        }
+        if (board.isPossibleToRedo()) {
+            redo.setDisable(false);
+        } else {
+            redo.setDisable(true);
+        }
+    }
 }

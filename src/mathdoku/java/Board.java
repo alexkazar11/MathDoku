@@ -20,6 +20,7 @@ import java.util.*;
  * It consists of NxN number of Cells arranged one after another and grouped in cells.
  */
 public class Board extends Canvas {
+    private final Game game;
     private GraphicsContext gc;
     private int size;
     private double cellWidth;
@@ -30,10 +31,13 @@ public class Board extends Canvas {
     private ArrayList<Cage> cages = new ArrayList<>();
     private boolean mistakesMode = false;
     private boolean gameOver = false;
+    private Toolbox.ListStack<CellVal> stack = new Toolbox.ListStack<>();
+    private Toolbox.ListStack<CellVal> stackUndone = new Toolbox.ListStack<>();
 
-    public Board(int size) throws IOException {
+    public Board(int size, Game game) throws IOException {
         this.size = size;
         this.gc = getGraphicsContext2D();
+        this.game = game;
 
         //Listeners to make the Board resizable
         widthProperty().addListener(evt -> update());
@@ -57,11 +61,18 @@ public class Board extends Canvas {
         drawGrid(size);
         drawCages();
         showValues();
-
         if (chosenCell != null) {
             chooseBox(chosenCell);
         }
+        winDetection();
+        game.disableUndoRedo();
+    }
 
+    /**
+     * Checks if the board is filled correctly
+     * and the user won, if so, pops up an alert.
+     */
+    private void winDetection() {
         if (checkGame() && !gameOver) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("YOU WON!");
@@ -111,10 +122,11 @@ public class Board extends Canvas {
      */
     public void clear() {
         chosenCell = null;
-        for (Cell cell :
-                arrayOfCells) {
+        for (Cell cell : arrayOfCells) {
             cell.setValue(0);
         }
+        stack.clear();
+        stackUndone.clear();
         update();
     }
 
@@ -148,7 +160,7 @@ public class Board extends Canvas {
     public void validateKeyboardInput(KeyEvent keyEvent) {
         if (keyEvent != null) {
             if (allowed.contains(keyEvent.getText())) {
-                setChosenCellValue(keyEvent);
+                setCellValue(chosenCell, Integer.parseInt(keyEvent.getText()));
             } else if (keyEvent.getCode() == KeyCode.BACK_SPACE) {
                 clearCellValue();
             } else if (keyEvent.getCode() == KeyCode.RIGHT) {
@@ -246,30 +258,76 @@ public class Board extends Canvas {
     }
 
     /**
-     * Sets the value from the keyEvent to the chosen Cell.
+     * Sets the given value to the given Cell.
      *
-     * @param keyEvent The keyEvent that contains the value to be used
+     * @param cell The Cell for the value to be set
+     * @param value The value to be set
      */
-    private void setChosenCellValue(KeyEvent keyEvent) {
-        if (chosenCell != null) {
-            setTextStrokeParameters(18);
-            int value = Integer.parseInt(keyEvent.getText());
-            chosenCell.setValue(value);
+    public void setCellValue(Cell cell, int value) {
+        cell.setValue(value);
+        stack.push(new CellVal(cell, value));
+        update();
+    }
+
+    /**
+     * Pops the last value inputted from the stack
+     * and pushes it onto another stack (for future redos).
+     */
+    public void undo() {
+        if (isPossibleToUndo()) {
+            CellVal cellVal = stack.pop();
+            stackUndone.push(cellVal);
+            setLastVal(cellVal.getCell());
             update();
         }
     }
 
     /**
-     * Sets the value to the chosen Cell.
-     *
-     * @param value The value to be used
+     * Pops the last value inputted from the undo stack
+     * and pushes it onto another stack (for future undos).
      */
-    public void setChosenCellValue(int value) {
-        if (chosenCell != null) {
-            setTextStrokeParameters(18);
-            chosenCell.setValue(value);
+    public void redo() {
+        if (isPossibleToRedo()) {
+            CellVal cellVal = stackUndone.pop();
+            stack.push(cellVal);
+            setLastVal(cellVal.getCell());
             update();
         }
+    }
+
+    /**
+     * Checks the stack for the last occurrence of the given cell,
+     * fetches the value from there and sets it as current value.
+     *
+     * @param cell The Cell the last occurrence of which is to be fetched.
+     */
+    private void setLastVal(Cell cell) {
+        ArrayList<CellVal> cellVals = stack.getList();
+        int lastVal = 0;
+        for (CellVal cellVal : cellVals) {
+            if (cell == cellVal.getCell()) {
+                lastVal = cellVal.getValue();
+            }
+        }
+        cell.setValue(lastVal);
+    }
+
+    /**
+     * Checks if the stack is empty.
+     *
+     * @return true - stack is not empty, false - stack is empty
+     */
+    public boolean isPossibleToUndo() {
+        return !stack.isEmpty();
+    }
+
+    /**
+     * Checks if the undo stack is empty.
+     *
+     * @return true - stack is not empty, false - stack is empty
+     */
+    public boolean isPossibleToRedo() {
+        return !stackUndone.isEmpty();
     }
 
     /**
@@ -707,6 +765,10 @@ public class Board extends Canvas {
 
     public Cell[] getArrayOfCells() {
         return arrayOfCells;
+    }
+
+    public Cell getChosenCell() {
+        return chosenCell;
     }
 
     @Override

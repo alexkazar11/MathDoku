@@ -49,4 +49,63 @@ public class Toolbox {
         return matrix;
     }
 
+    /**
+     * A stack implementation, using an ArrayList.
+     *
+     * @param <T> Type of elements, the stack can store and work with.
+     */
+    public static class ListStack<T> {
+
+        private ArrayList<T> stack;
+
+        public ListStack() {
+            this.stack = new ArrayList<>();
+        }
+
+        public void push(T item) {
+            stack.add(item);
+        }
+
+        public T pop() {
+            if (stack.size() == 0)
+                throw new IllegalStateException("Stack is empty");
+            return stack.remove(stack.size() - 1);
+        }
+
+        public boolean contains(T item) {
+            return stack.contains(item);
+        }
+
+        public int size() {
+            return stack.size();
+        }
+
+        public boolean isEmpty() {
+            return stack.size() == 0;
+        }
+
+        public T peek() {
+            return stack.get(stack.size() - 1);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder string = new StringBuilder("ListStack = { ");
+            for (T t : stack) {
+                string.append(t);
+            }
+            string.append(" }");
+            return string.toString();
+        }
+
+        public ArrayList<T> getList() {
+            return stack;
+        }
+
+        public void clear() {
+            stack.clear();
+        }
+
+    }
+
 }
