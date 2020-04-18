@@ -8,7 +8,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
@@ -166,6 +168,39 @@ public class Menu extends Application {
             }
         });
 
+        //When load from the text input is pressed, opens up a new window with a TextArea
+        loadFromInput.setOnAction(actionEvent -> {
+            Stage loadFromFileStage = new Stage();
+            loadFromFileStage.setTitle("Load From Text Input");
+            TextArea textArea = new TextArea();
+            Button submit = new Button("Submit");
+
+            submit.setOnAction(e -> {
+                try {
+                    String pathToPuzzle = "src/mathdoku/resources/puzzles/puzzleFromInput.txt";
+                    FileWriter w = new FileWriter(pathToPuzzle);
+                    w.write(textArea.getText());
+                    w.close();
+                    int difficulty = getDifficulty(difficultyBox);
+                    Game game = new Game(stage, getBoardSizeFromFile(pathToPuzzle), difficulty, pathToPuzzle);
+                    loadFromFileStage.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+
+            BorderPane borderPane = new BorderPane();
+            borderPane.setCenter(textArea);
+
+            HBox hBox = new HBox(submit);
+            hBox.setAlignment(Pos.CENTER);
+            hBox.setPadding(new Insets(5, 50, 5, 50));
+            borderPane.setBottom(hBox);
+            Scene scene = new Scene(borderPane, 300, 250);
+            loadFromFileStage.setScene(scene);
+            loadFromFileStage.show();
+        });
+
         //Stage setup
         stage.setResizable(false);
         stage.setTitle("MathDoku");
@@ -173,6 +208,13 @@ public class Menu extends Application {
         stage.show();
     }
 
+    /**
+     * Traverses the puzzle file and calculates the Board Size for the Game.
+     *
+     * @param filename The filename of the puzzle
+     * @return The Board size
+     * @throws IOException Exception is thrown if there's something wrong with the file
+     */
     private int getBoardSizeFromFile(String filename) throws IOException {
         int largest = 0;
         try (FileInputStream fileInputStream = new FileInputStream(filename);

@@ -73,7 +73,6 @@ public class Game extends Application {
             this.board = new Board(boardSize, this, puzzle);
         }
 
-
         //Panes setup (wrapping Board inside Pane)
         BorderPane borderPane = new BorderPane();
         Pane pane = new Pane();
