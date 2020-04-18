@@ -29,6 +29,7 @@ public class Game extends Application {
     private Board board;
     private Button undo = new Button("Undo");
     private Button redo = new Button("Redo");
+    private boolean mistakesMode = false;
 
     /**
      * Creates a new Game.
@@ -164,7 +165,15 @@ public class Game extends Application {
         });
 
         //When Show Mistakes toggle is pressed starts highlighting mistakes red
-        showMistakes.setOnAction(e -> board.mistakes());
+        showMistakes.setOnAction(e -> {
+            board.mistakes();
+            if (!mistakesMode) {
+                highlightButton(showMistakes, true);
+            } else {
+                highlightButton(showMistakes, false);
+            }
+            mistakesMode = !mistakesMode;
+        });
 
         //When undo is pressed, cancels the last action
         undo.setOnAction(e -> board.undo());
@@ -215,5 +224,16 @@ public class Game extends Application {
         } else {
             redo.setDisable(true);
         }
+    }
+
+    private void highlightButton(Button button, boolean toColor) {
+        if (toColor) {
+            button.setStyle("-fx-border-width: 1;"
+                    + "-fx-border-color: black;"
+                    + "-fx-border-radius: 3;");
+        } else {
+            button.setStyle(null);
+        }
+
     }
 }

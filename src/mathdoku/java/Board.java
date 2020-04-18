@@ -159,7 +159,7 @@ public class Board extends Canvas {
      */
     public void validateKeyboardInput(KeyEvent keyEvent) {
         if (keyEvent != null) {
-            if (allowed.contains(keyEvent.getText())) {
+            if (allowed.contains(keyEvent.getText()) && chosenCell != null) {
                 setCellValue(chosenCell, Integer.parseInt(keyEvent.getText()));
             } else if (keyEvent.getCode() == KeyCode.BACK_SPACE) {
                 clearCellValue();
