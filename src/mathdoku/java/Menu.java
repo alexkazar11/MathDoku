@@ -11,7 +11,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -147,11 +151,48 @@ public class Menu extends Application {
             System.exit(0);
         });
 
+        //When load from the file is pressed, opens up a file chooser window
+        loadFromFile.setOnAction(actionEvent -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(new File("src/mathdoku/resources/puzzles"));
+            File puzzleFile = fileChooser.showOpenDialog(stage);
+            if (puzzleFile != null) {
+                try {
+                    int difficulty = getDifficulty(difficultyBox);
+                    Game game = new Game(stage, getBoardSizeFromFile(puzzleFile.getPath()), difficulty, puzzleFile.getPath());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
         //Stage setup
         stage.setResizable(false);
         stage.setTitle("MathDoku");
         stage.setScene(new Scene(outsideVBox, 400, 435));
         stage.show();
+    }
+
+    private int getBoardSizeFromFile(String filename) throws IOException {
+        int largest = 0;
+        try (FileInputStream fileInputStream = new FileInputStream(filename);
+             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
+             BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] var = line.split("\\s+");
+                String[] cellIDs = var[1].split(",");
+                for (String cellID : cellIDs) {
+                    if (Integer.parseInt(cellID) > largest) {
+                        largest = Integer.parseInt(cellID);
+                    }
+                }
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return (int) Math.sqrt(largest);
     }
 
     /**

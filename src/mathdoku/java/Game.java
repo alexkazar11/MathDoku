@@ -24,6 +24,7 @@ import java.util.Optional;
  */
 public class Game extends Application {
 
+    private String puzzle;
     private int boardSize;
     private int difficulty;
     private Board board;
@@ -45,12 +46,33 @@ public class Game extends Application {
         start(stage);
     }
 
+    /**
+     * Creates a new Game from a txt file.
+     *
+     * @param stage      Stage where the Game is
+     * @param boardSize  Size of the Square Board NxN as N (from 2 to 8)
+     * @param difficulty Difficulty level (from 1 to 3, where 1 is Easy)
+     * @param puzzle     Filepath to the puzzle
+     * @throws Exception Exception is thrown in case something is wrong with the stage
+     */
+    public Game(Stage stage, int boardSize, int difficulty, String puzzle) throws Exception {
+        this.boardSize = boardSize;
+        this.difficulty = difficulty;
+        this.puzzle = puzzle;
+        start(stage);
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         /* ------- Visual Elements Setup ------- */
 
         //Board (Canvas) setup
-        this.board = new Board(boardSize, this);
+        if (puzzle == null) {
+            this.board = new Board(boardSize, this);
+        } else {
+            this.board = new Board(boardSize, this, puzzle);
+        }
+
 
         //Panes setup (wrapping Board inside Pane)
         BorderPane borderPane = new BorderPane();
@@ -234,6 +256,7 @@ public class Game extends Application {
         } else {
             button.setStyle(null);
         }
-
     }
+
+
 }

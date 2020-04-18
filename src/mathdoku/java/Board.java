@@ -21,6 +21,7 @@ import java.util.*;
  */
 public class Board extends Canvas {
     private final Game game;
+    private String puzzle;
     private GraphicsContext gc;
     private int size;
     private double cellWidth;
@@ -50,6 +51,26 @@ public class Board extends Canvas {
         generateAllowedNumbers();
 
         loadDefaultGame();
+        drawCages();
+    }
+
+    public Board(int size, Game game, String puzzle) throws IOException {
+        this.size = size;
+        this.gc = getGraphicsContext2D();
+        this.game = game;
+        this.puzzle = puzzle;
+
+        //Listeners to make the Board resizable
+        widthProperty().addListener(evt -> update());
+        heightProperty().addListener(evt -> update());
+
+        //Generates a list of Cells
+        generateCells(size);
+
+        //Generate list of allowed number inputs
+        generateAllowedNumbers();
+
+        readFile(puzzle);
         drawCages();
     }
 
