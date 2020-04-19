@@ -34,6 +34,8 @@ public class Board extends Canvas {
     private boolean gameOver = false;
     private Toolbox.ListStack<CellVal> stack = new Toolbox.ListStack<>();
     private Toolbox.ListStack<CellVal> stackUndone = new Toolbox.ListStack<>();
+    private int fontLabel = 10;
+    private int fontInput = 18;
 
     public Board(int size, Game game) throws IOException {
         this.size = size;
@@ -368,7 +370,7 @@ public class Board extends Canvas {
      * Prints the values of all Cells inside those Cells on the board.
      */
     private void showValues() {
-        setTextStrokeParameters(18);
+        setTextStrokeParameters(fontInput);
         for (Cell cell : arrayOfCells) {
             if (cell.getValue() > 0) {
                 gc.strokeText(Integer.toString(cell.getValue()),
@@ -479,11 +481,11 @@ public class Board extends Canvas {
         List<Cell> cellsSorted = new ArrayList<>(cage.getCells());
         cellsSorted.sort(cage.getComparator());
         Cell firstCell = cellsSorted.get(0);
-        double cageStartY = firstCell.getCoordinates()[1] * cellHeight;
         double cageStartX = firstCell.getCoordinates()[0] * cellWidth;
+        double cageStartY = firstCell.getCoordinates()[1] * cellHeight;
 
         //Sets the font size for the target
-        setTextStrokeParameters(10);
+        setTextStrokeParameters(fontLabel);
         gc.setLineWidth(1);
 
         //Changes the "padding" for the label depending on the board size
@@ -815,4 +817,26 @@ public class Board extends Canvas {
         return cellHeight;
     }
 
+    /**
+     * Sets a font size for the Board.
+     *
+     * @param value The Font size value
+     */
+    public void setFont(String value) {
+        switch (value) {
+            case "Small":
+                fontInput = 15;
+                fontLabel = 7;
+                break;
+            case "Medium":
+                fontInput = 18;
+                fontLabel = 10;
+                break;
+            case "Large":
+                fontInput = 21;
+                fontLabel = 13;
+                break;
+        }
+        update();
+    }
 }

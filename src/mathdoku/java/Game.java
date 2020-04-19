@@ -2,6 +2,8 @@ package mathdoku.java;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -221,6 +223,50 @@ public class Game extends Application {
         //When a key is pressed it's saved in a variable and the board is updated
         board.setOnKeyPressed(board::validateKeyboardInput);
 
+        //When preferences button is pressed, opens the setting window
+        preferences.setOnAction(actionEvent -> {
+            //Creating the Stage
+            Stage preferencesStage = new Stage();
+            preferencesStage.setTitle("Load From Text Input");
+
+            //Elements setup
+            Label fontSizeLabel = new Label("Font Size: ");
+            ObservableList<String> fontSizeOptions =
+                    FXCollections.observableArrayList("Small", "Medium", "Large");
+            ComboBox<String> fontSizeBox = new ComboBox<>(fontSizeOptions);
+            Button done = new Button("Done");
+
+            //Creating Panes
+            VBox preferencesVBox = new VBox();
+            HBox preferencesHBox = new HBox();
+
+            //HBox alignment and padding
+            preferencesHBox.setAlignment(Pos.CENTER);
+            preferencesHBox.setSpacing(10);
+            preferencesHBox.setPadding(new Insets(10, 10, 10, 10));
+
+            //VBox alignment and padding
+            preferencesVBox.setAlignment(Pos.CENTER);
+            preferencesVBox.setSpacing(10);
+            preferencesVBox.setPadding(new Insets(10, 10, 10, 10));
+
+            //Adding elements to the panes
+            preferencesHBox.getChildren().addAll(fontSizeLabel, fontSizeBox);
+            preferencesVBox.getChildren().addAll(preferencesHBox, done);
+
+            //When done is pressed, sets the font for the board and closes the preferences window
+            done.setOnAction(actionEvent1 -> {
+                board.setFont(fontSizeBox.getValue());
+                preferencesStage.close();
+            });
+
+            //Stage setup
+            preferencesStage.setResizable(false);
+            preferencesStage.setScene(new Scene(preferencesVBox));
+            preferencesStage.show();
+
+        });
+
         //Stage setup
         stage.setMinHeight(435);
         stage.setMinWidth(400);
@@ -256,6 +302,4 @@ public class Game extends Application {
             button.setStyle(null);
         }
     }
-
-
 }
