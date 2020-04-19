@@ -1,9 +1,6 @@
 package mathdoku.java;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -47,6 +44,24 @@ public class Toolbox {
         }
 
         return matrix;
+    }
+
+    /**
+     * Finds duplicates in the given ArrayList using a HashSet.
+     *
+     * @param list The ArrayList to be traversed
+     * @param <T>  Type of elements, the ArrayList can store and work with.
+     * @return true - if duplicates are present, false - otherwise
+     */
+    public static <T> boolean findDuplicates(ArrayList<T> list) {
+        Set<T> lump = new HashSet<>();
+        for (T t : list) {
+            if (lump.contains(t)) {
+                return true;
+            }
+            lump.add(t);
+        }
+        return false;
     }
 
     /**

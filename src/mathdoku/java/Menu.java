@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 
 /**
@@ -25,6 +26,7 @@ import java.nio.charset.StandardCharsets;
  * Menu also allows user to load an old game, if a text file exists.
  */
 public class Menu extends Application {
+    private int boardSize = 0;
 
     public static void main(String[] args) {
         launch(args);
@@ -121,7 +123,6 @@ public class Menu extends Application {
 
         //When the Start button is pressed, opens Game in the same stage
         start.setOnAction(actionEvent -> {
-            int boardSize = 0;
             int difficulty = 0;
 
             //Gets the values chosen by the user from the ComboBoxes
@@ -138,11 +139,7 @@ public class Menu extends Application {
                 }
             } else {
                 //If the ComboBoxes are empty - the error message is shown
-                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                errorAlert.setHeaderText("Input not valid");
-                errorAlert.setContentText(
-                        "You have to choose one of the options for the board size and difficulty level!");
-                errorAlert.showAndWait();
+                errorMsg("You have to choose one of the options for the board size and difficulty level!");
             }
 
         });
@@ -161,7 +158,9 @@ public class Menu extends Application {
             if (puzzleFile != null) {
                 try {
                     int difficulty = getDifficulty(difficultyBox);
-                    Game game = new Game(stage, getBoardSizeFromFile(puzzleFile.getPath()), difficulty, puzzleFile.getPath());
+                    if (checkFile(puzzleFile.getPath())) {
+                        Game game = new Game(stage, boardSize, difficulty, puzzleFile.getPath());
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -182,8 +181,10 @@ public class Menu extends Application {
                     w.write(textArea.getText());
                     w.close();
                     int difficulty = getDifficulty(difficultyBox);
-                    Game game = new Game(stage, getBoardSizeFromFile(pathToPuzzle), difficulty, pathToPuzzle);
-                    loadFromFileStage.close();
+                    if (checkFile(pathToPuzzle)) {
+                        Game game = new Game(stage, boardSize, difficulty, pathToPuzzle);
+                        loadFromFileStage.close();
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -209,32 +210,107 @@ public class Menu extends Application {
     }
 
     /**
-     * Traverses the puzzle file and calculates the Board Size for the Game.
+     * Traverses a puzzle file line by line to check the formatting.
      *
-     * @param filename The filename of the puzzle
-     * @return The Board size
-     * @throws IOException Exception is thrown if there's something wrong with the file
+     * @param filename Path to the puzzle file
+     * @return true - file is correctly formatted, false - otherwise
+     * @throws IOException Exception is thrown if there is a problem with the file
      */
-    private int getBoardSizeFromFile(String filename) throws IOException {
-        int largest = 0;
+    private boolean checkFile(String filename) throws IOException {
         try (FileInputStream fileInputStream = new FileInputStream(filename);
              InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
              BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
+            //An ArrayList to store all CellIDs in the file
+            ArrayList<Integer> allCellIDs = new ArrayList<>();
+
+            //Stores the total number of lines in the txt file
+            int numberOfLines = 0;
+
+            //Stores the largest CellID in the ArrayList
+            int largestID = 0;
+
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                String[] var = line.split("\\s+");
-                String[] cellIDs = var[1].split(",");
-                for (String cellID : cellIDs) {
-                    if (Integer.parseInt(cellID) > largest) {
-                        largest = Integer.parseInt(cellID);
-                    }
+                //Increments a number of lines
+                numberOfLines++;
+
+                //Trimming the line from leading and trailing whitespaces
+                String trimmedLine = line.trim();
+
+                //Target is a substring until the first whitespace
+                String target = trimmedLine.substring(0, trimmedLine.indexOf(' '));
+
+                //CellIDs are everything after the first whitespace
+                String cellIDs = trimmedLine.substring(trimmedLine.indexOf(' ') + 1);
+
+                //Creating an array of CellIDs, also trimming any extra whitespaces
+                String[] cellIDsArray = cellIDs.trim().split("\\s*,\\s*");
+
+                //Checks that Cages without an arithmetic operator only have one Cell ID
+                if (target.length() == 1 && cellIDsArray.length > 1) {
+                    errorMsg("Cages without an arithmetic operator must only have one Cell ID");
+                    return false;
+                }
+
+                //Adding all CellIDs from current line to an ArrayList of all CellIDs
+                for (String cellID : cellIDsArray) {
+                    allCellIDs.add(Integer.parseInt(cellID));
+                    System.out.println(cellID);
                 }
             }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+
+            //Checking an array of Cell Ids for duplicates
+            if (Toolbox.findDuplicates(allCellIDs)) {
+                errorMsg("You can't have the same Cell being assigned to more than one Cage!");
+                return false;
+            }
+
+            //Finds the largest CellID in the file
+            for (int cellID : allCellIDs) {
+                if (cellID > largestID) {
+                    largestID = cellID;
+                }
+            }
+
+            //The number of cells must be equal to the largest CellID
+            if (allCellIDs.size() != largestID) {
+                errorMsg("Some Cell IDs might be missing, please check the formatting guide!");
+                return false;
+            }
+
+            //Calculates the Board size for the Game
+            this.boardSize = (int) Math.sqrt(largestID);
+            if (Math.pow(boardSize, 2) != largestID) {
+                errorMsg("The largest Cell ID is not a perfect square!");
+                return false;
+            }
+
+            //Checks the number of lines in the file
+            if (numberOfLines == 0) {
+                errorMsg("You can't have an empty input!");
+                return false;
+            } else if (numberOfLines > 64) {
+                errorMsg("Too many lines, please check the formatting guide!");
+            }
+
+        } catch (Exception e) {
+            errorMsg("There is a problem with your input, please check the formatting guide!");
+            return false;
         }
-        return (int) Math.sqrt(largest);
+        return true;
+    }
+
+    /**
+     * Pops up an error message with a given description.
+     *
+     * @param msg Description of the error
+     */
+    private void errorMsg(String msg) {
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+        errorAlert.setHeaderText("Input not valid");
+        errorAlert.setContentText(msg);
+        errorAlert.showAndWait();
     }
 
     /**
