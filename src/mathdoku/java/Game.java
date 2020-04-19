@@ -97,6 +97,7 @@ public class Game extends Application {
         //Creating Buttons
         Button showMistakes = new Button("Show Mistakes");
         Button clear = new Button("Clear");
+        Button solve = new Button("Solve");
 
         //Creating side numpad buttons
         Button buttonNum1 = new Button("1");
@@ -110,7 +111,7 @@ public class Game extends Application {
         Button buttonNumX = new Button("X");
 
         //Setting up button sizes and alignment
-        Button[] buttons = new Button[]{undo, redo, showMistakes, clear,
+        Button[] buttons = new Button[]{undo, redo, solve, showMistakes, clear,
                 buttonNum1, buttonNum2, buttonNum3, buttonNum4,
                 buttonNum5, buttonNum6, buttonNum7, buttonNum8, buttonNumX};
         for (Button button : buttons) {
@@ -129,7 +130,7 @@ public class Game extends Application {
         hBox.setAlignment(Pos.CENTER);
         hBox.setSpacing(10);
         hBox.setPadding(new Insets(10, 10, 10, 10));
-        hBox.getChildren().addAll(undo, redo, showMistakes, clear);
+        hBox.getChildren().addAll(undo, redo, solve, showMistakes, clear);
 
         //VBox NumPad creating & aligning
         Button[] numPad = new Button[]{buttonNum1, buttonNum2, buttonNum3, buttonNum4,
@@ -222,6 +223,11 @@ public class Game extends Application {
 
         //When a key is pressed it's saved in a variable and the board is updated
         board.setOnKeyPressed(board::validateKeyboardInput);
+
+        solve.setOnAction(actionEvent -> {
+            board.solve();
+            board.update();
+        });
 
         //When preferences button is pressed, opens the setting window
         preferences.setOnAction(actionEvent -> {

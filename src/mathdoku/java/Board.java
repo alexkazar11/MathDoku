@@ -80,7 +80,7 @@ public class Board extends Canvas {
      * Redraws the Board every time the window
      * is resized or a new event has happened.
      */
-    private void update() {
+    public void update() {
         drawGrid(size);
         drawCages();
         showValues();
@@ -122,8 +122,8 @@ public class Board extends Canvas {
 
         //If the mistakes mode is on, checks and highlights Cells with mistakes
         if (mistakesMode) {
-            //checkRows(true);
-            //checkCols(true);
+            checkRows(true);
+            checkCols(true);
             checkCages(true);
         }
 
@@ -786,6 +786,54 @@ public class Board extends Canvas {
         update();
     }
 
+    /**
+     * Sets a font size for the Board.
+     *
+     * @param value The Font size value
+     */
+    public void setFont(String value) {
+        switch (value) {
+            case "Small":
+                fontInput = 15;
+                fontLabel = 7;
+                break;
+            case "Medium":
+                fontInput = 18;
+                fontLabel = 10;
+                break;
+            case "Large":
+                fontInput = 21;
+                fontLabel = 13;
+                break;
+        }
+        update();
+    }
+
+    /**
+     * Solves the puzzle using a backtracking algorithm.
+     *
+     * @return true - solved, false - otherwise
+     */
+    public boolean solve() {
+        for (Cell arrayOfCell : arrayOfCells) {
+            if (arrayOfCell.getValue() == 0) {
+                for (String s : allowed) {
+                    arrayOfCell.setValue(Integer.parseInt(s));
+                    if (checkCols(false)
+                            && checkRows(false)
+                            && checkCages(false)
+                            && solve()) {
+                        return true;
+                    } else {
+                        arrayOfCell.setValue(0);
+                    }
+                }
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Cell[] getArrayOfCells() {
         return arrayOfCells;
     }
@@ -817,26 +865,4 @@ public class Board extends Canvas {
         return cellHeight;
     }
 
-    /**
-     * Sets a font size for the Board.
-     *
-     * @param value The Font size value
-     */
-    public void setFont(String value) {
-        switch (value) {
-            case "Small":
-                fontInput = 15;
-                fontLabel = 7;
-                break;
-            case "Medium":
-                fontInput = 18;
-                fontLabel = 10;
-                break;
-            case "Large":
-                fontInput = 21;
-                fontLabel = 13;
-                break;
-        }
-        update();
-    }
 }

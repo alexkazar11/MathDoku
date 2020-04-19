@@ -36,6 +36,11 @@ public class Cage {
         if (isEmpty()) {
             return true;
         }
+        for (Cell cell : cells) {
+            if (cell.getValue() == 0) {
+                return true;
+            }
+        }
 
         if (target.length() == 1) {
             return Integer.parseInt(target) == cells.get(0).getValue();
