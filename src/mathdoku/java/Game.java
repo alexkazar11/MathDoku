@@ -90,7 +90,9 @@ public class Game extends Application {
         MenuItem backToMenu = new MenuItem("Back to Menu");
         MenuItem preferences = new MenuItem("Options");
         MenuItem quit = new MenuItem("Quit");
+        MenuItem howTo = new MenuItem("What is MathDoku?");
         file.getItems().addAll(backToMenu, preferences, quit);
+        help.getItems().addAll(howTo);
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(file, help);
 
@@ -176,6 +178,11 @@ public class Game extends Application {
         quit.setOnAction(actionEvent -> {
             Platform.exit();
             System.exit(0);
+        });
+
+        //Opens wikipedia page for KenKen if the "What is Mathdoku" is pressed
+        howTo.setOnAction(actionEvent -> {
+            getHostServices().showDocument("https://en.wikipedia.org/wiki/KenKen");
         });
 
         //When Clear is pressed pops up a window asking to confirm the action

@@ -100,7 +100,9 @@ public class Menu extends Application {
         MenuItem loadFromFile = new MenuItem("Load from file");
         MenuItem loadFromInput = new MenuItem("Load from text input");
         MenuItem quit = new MenuItem("Quit");
+        MenuItem howTo = new MenuItem("What is MathDoku?");
         file.getItems().addAll(loadFromFile, loadFromInput, quit);
+        help.getItems().addAll(howTo);
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(file, help);
 
@@ -142,6 +144,11 @@ public class Menu extends Application {
                 errorMsg("You have to choose one of the options for the board size and difficulty level!");
             }
 
+        });
+
+        //Opens wikipedia page for KenKen if the "What is Mathdoku" is pressed
+        howTo.setOnAction(actionEvent -> {
+            getHostServices().showDocument("https://en.wikipedia.org/wiki/KenKen");
         });
 
         //When Quit is pressed quits the game
