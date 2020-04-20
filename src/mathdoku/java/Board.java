@@ -150,6 +150,7 @@ public class Board extends Canvas {
         }
         stack.clear();
         stackUndone.clear();
+        gameOver = false;
         update();
     }
 
@@ -832,6 +833,57 @@ public class Board extends Canvas {
             }
         }
         return true;
+    }
+
+    /**
+     * Solves the puzzle, then corrects one value that is not correct.
+     *
+     * @return true - hint given, false - not given
+     */
+    public boolean showHint() {
+
+        //Saves the current values of all Cells to an ArrayList
+        ArrayList<CellVal> lastStateOfCells = new ArrayList<>();
+
+        for (Cell cell : arrayOfCells) {
+            int value = cell.getValue();
+            lastStateOfCells.add(new CellVal(cell, value));
+        }
+        clear();
+
+        //Solves the puzzle and saves the values in another ArrayList
+        solve();
+        ArrayList<CellVal> solvedCells = new ArrayList<>();
+        for (Cell cell : arrayOfCells) {
+            int value = cell.getValue();
+            solvedCells.add(new CellVal(cell, value));
+        }
+
+        clear();
+
+        //Restore the last state of the Cells
+        for (Cell cell : arrayOfCells) {
+            for (CellVal cellVal : lastStateOfCells) {
+                if (cell.equals(cellVal.getCell())) {
+                    int value = cellVal.getValue();
+                    cell.setValue(value);
+                }
+            }
+        }
+
+        //Iterates over the array of cells and compares the next value to the solved value,
+        //if it's not the same, replaces it with the correct one
+        for (Cell cell : arrayOfCells) {
+            for (CellVal cellVal : solvedCells) {
+                if (cell.getCellID() == cellVal.getCell().getCellID()
+                        && cell.getValue() != cellVal.getValue()) {
+                    cell.setValue(cellVal.getValue());
+                    chosenCell = cell;
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public Cell[] getArrayOfCells() {
