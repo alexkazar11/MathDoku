@@ -3,13 +3,13 @@ package mathdoku.java;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Alert;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -97,11 +97,16 @@ public class Board extends Canvas {
      */
     private void winDetection() {
         if (checkGame() && !gameOver) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("YOU WON!");
-            alert.setHeaderText("CONGRATULATIONS!");
-            alert.setContentText("You won the game, neat! Try another one!");
-            alert.showAndWait();
+            WinAnimation winAnimation = new WinAnimation();
+            winAnimation.start(new Stage());
+
+            //Alert alternative
+//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//            alert.setTitle("YOU WON!");
+//            alert.setHeaderText("CONGRATULATIONS!");
+//            alert.setContentText("You won the game, neat! Try another one!");
+//            alert.showAndWait();
+
             gameOver = true;
         }
     }
