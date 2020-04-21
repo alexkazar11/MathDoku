@@ -12,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -26,6 +27,9 @@ import java.util.Optional;
  */
 public class Game extends Application {
 
+    private ArrayList<Cage> cages;
+    private Cell[] cells;
+    private ArrayList<String> allowed;
     private String puzzle;
     private int boardSize;
     private int difficulty;
@@ -39,12 +43,10 @@ public class Game extends Application {
      *
      * @param stage      Stage where the Game is
      * @param boardSize  Size of the Square Board NxN as N (from 2 to 8)
-     * @param difficulty Difficulty level (from 1 to 3, where 1 is Easy)
      * @throws Exception Exception is thrown in case something is wrong with the stage
      */
-    public Game(Stage stage, int boardSize, int difficulty) throws Exception {
+    public Game(Stage stage, int boardSize) throws Exception {
         this.boardSize = boardSize;
-        this.difficulty = difficulty;
         start(stage);
     }
 
@@ -53,14 +55,32 @@ public class Game extends Application {
      *
      * @param stage      Stage where the Game is
      * @param boardSize  Size of the Square Board NxN as N (from 2 to 8)
-     * @param difficulty Difficulty level (from 1 to 3, where 1 is Easy)
      * @param puzzle     Filepath to the puzzle
      * @throws Exception Exception is thrown in case something is wrong with the stage
      */
-    public Game(Stage stage, int boardSize, int difficulty, String puzzle) throws Exception {
+    public Game(Stage stage, int boardSize, String puzzle) throws Exception {
         this.boardSize = boardSize;
-        this.difficulty = difficulty;
         this.puzzle = puzzle;
+        start(stage);
+    }
+
+    /**
+     * Creates a new randomly generated Game.
+     *
+     * @param stage      Stage where the Game is
+     * @param boardSize  Size of the Square Board NxN as N (from 2 to 8)
+     * @param allowed    Pre-generated Allowed numbers
+     * @param cells      Pre-generated Cells
+     * @param cages      Pre-generated Cages
+     * @param difficulty Difficulty level (1 to 3)
+     * @throws Exception Exception is thrown in case something is wrong with the stage
+     */
+    public Game(Stage stage, int boardSize, ArrayList<String> allowed, Cell[] cells, ArrayList<Cage> cages, int difficulty) throws Exception {
+        this.boardSize = boardSize;
+        this.allowed = allowed;
+        this.cells = cells;
+        this.cages = cages;
+        this.difficulty = difficulty;
         start(stage);
     }
 
@@ -69,11 +89,14 @@ public class Game extends Application {
         /* ------- Visual Elements Setup ------- */
 
         //Board (Canvas) setup
-        if (puzzle == null) {
-            this.board = new Board(boardSize, this);
-        } else {
+        if (puzzle != null) {
             this.board = new Board(boardSize, this, puzzle);
+        } else if (cages != null) {
+            this.board = new Board(this, boardSize, allowed,cells,cages);
+        } else {
+            this.board = new Board(boardSize, this);
         }
+
 
         //Panes setup (wrapping Board inside Pane)
         BorderPane borderPane = new BorderPane();
@@ -87,12 +110,14 @@ public class Game extends Application {
         //Menubar (have to specify javaFX path, since the class is also called Menu
         javafx.scene.control.Menu file = new javafx.scene.control.Menu("File");
         javafx.scene.control.Menu help = new javafx.scene.control.Menu("Help");
+        MenuItem newBoard = new MenuItem("Generate new board");
         MenuItem backToMenu = new MenuItem("Back to Menu");
         MenuItem preferences = new MenuItem("Options");
         MenuItem quit = new MenuItem("Quit");
         MenuItem howTo = new MenuItem("What is MathDoku?");
-        file.getItems().addAll(backToMenu, preferences, quit);
-        help.getItems().addAll(howTo);
+        MenuItem showSolution = new MenuItem("Show solution");
+        file.getItems().addAll(newBoard, backToMenu, preferences, quit);
+        help.getItems().addAll(showSolution, howTo);
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(file, help);
 
@@ -185,6 +210,18 @@ public class Game extends Application {
             getHostServices().showDocument("https://en.wikipedia.org/wiki/KenKen");
         });
 
+        //Generates a new puzzle
+        newBoard.setOnAction(actionEvent -> {
+            try {
+                new Generator(stage, boardSize, difficulty);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        //Solves the puzzle if the Show Solution is pressed
+        showSolution.setOnAction(actionEvent -> board.showSolution());
+
         //When Clear is pressed pops up a window asking to confirm the action
         clear.setOnAction(actionEvent -> {
             Alert clearAlert = new Alert(Alert.AlertType.CONFIRMATION,
@@ -223,6 +260,7 @@ public class Game extends Application {
                 if (Arrays.equals(listOfCell.getCoordinates(), chosenXY)) {
                     cell = listOfCell;
                     board.chooseBox(cell);
+                    System.out.println(Arrays.toString(cell.getCoordinates()));
                     break;
                 }
             }
@@ -306,6 +344,11 @@ public class Game extends Application {
         }
     }
 
+    /**
+     * Creates an outline for the given button.
+     * @param button The button to be outlined
+     * @param toColor The color for the outline
+     */
     private void highlightButton(Button button, boolean toColor) {
         if (toColor) {
             button.setStyle("-fx-border-width: 1;"

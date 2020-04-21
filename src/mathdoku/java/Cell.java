@@ -17,6 +17,7 @@ public class Cell implements Comparable<Cell> {
     private int cellID;
     private int value;
     private int[] coordinates;
+    private boolean inCage = false;
 
     public Cell(int cellID, int value, int[] coordinates) {
         this.cellID = cellID;
@@ -53,5 +54,13 @@ public class Cell implements Comparable<Cell> {
 
     public int[] getCoordinates() {
         return coordinates;
+    }
+
+    public boolean isInCage() {
+        return inCage;
+    }
+
+    public void setInCage(boolean inCage) {
+        this.inCage = inCage;
     }
 }

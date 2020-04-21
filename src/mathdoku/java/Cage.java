@@ -25,6 +25,19 @@ public class Cage {
         this.target = target;
         this.cells = cells;
         this.size = cells.size();
+
+        for (Cell cell : cells) {
+            cell.setInCage(true);
+        }
+    }
+
+    public Cage(ArrayList<Cell> cells) {
+        this.cells = cells;
+        this.size = cells.size();
+
+        for (Cell cell : cells) {
+            cell.setInCage(true);
+        }
     }
 
     /**
@@ -121,6 +134,10 @@ public class Cage {
 
     public String getTarget() {
         return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
     }
 
     public ArrayList<Cell> getCells() {

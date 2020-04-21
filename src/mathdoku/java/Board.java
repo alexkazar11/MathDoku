@@ -76,6 +76,22 @@ public class Board extends Canvas {
         drawCages();
     }
 
+    public Board(Game game, int size, ArrayList<String> allowed, Cell[] cells, ArrayList<Cage> cages) throws IOException {
+        this.size = size;
+        this.gc = getGraphicsContext2D();
+        this.game = game;
+        this.arrayOfCells = cells;
+        this.cages = cages;
+        this.allowed = allowed;
+
+        //Listeners to make the Board resizable
+        widthProperty().addListener(evt -> update());
+        heightProperty().addListener(evt -> update());
+
+        //Generate list of allowed number inputs
+        drawCages();
+    }
+
     /**
      * Redraws the Board every time the window
      * is resized or a new event has happened.
@@ -89,6 +105,14 @@ public class Board extends Canvas {
         }
         winDetection();
         game.disableUndoRedo();
+    }
+
+    /**
+     * Shows the solution on the Board.
+     */
+    public void showSolution() {
+        solve();
+        showValues();
     }
 
     /**
@@ -820,7 +844,7 @@ public class Board extends Canvas {
      *
      * @return true - solved, false - otherwise
      */
-    public boolean solve() {
+    private boolean solve() {
         for (Cell arrayOfCell : arrayOfCells) {
             if (arrayOfCell.getValue() == 0) {
                 for (String s : allowed) {

@@ -135,7 +135,8 @@ public class Menu extends Application {
             if (boardSize != 0 && difficulty != 0) {
                 try {
                     //Starts the Game with the chosen difficulty and boarder size
-                    Game game = new Game(stage, boardSize, difficulty);
+                    new Generator(stage, boardSize, difficulty);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -143,6 +144,43 @@ public class Menu extends Application {
                 //If the ComboBoxes are empty - the error message is shown
                 errorMsg("You have to choose one of the options for the board size and difficulty level!");
             }
+
+        });
+
+        showRules.setOnAction(actionEvent -> {
+            Stage rulesStage = new Stage();
+            rulesStage.setTitle("Rules of the game");
+
+            VBox vBox = new VBox();
+            vBox.setAlignment(Pos.CENTER);
+            vBox.setSpacing(10);
+            vBox.setPadding(new Insets(20, 20, 20, 20));
+
+            Separator separator1 = new Separator();
+            Separator separator2 = new Separator();
+
+            Label rules = new Label("RULES");
+            rules.setFont(Font.font(30));
+            Label rule1 = new Label("1. Digits may appear only once in each row and column");
+            rule1.setFont(Font.font(16));
+            Label rule2 = new Label("2.The grids are divided in cages with target numbers and operators");
+            rule2.setFont(Font.font(16));
+            Label rule3 = new Label("3. Find a mathematical solution using the operator and target");
+            rule3.setFont(Font.font(16));
+            Label rule4 = new Label("4. Know the number combinations");
+            rule4.setFont(Font.font(16));
+            Label rule5 = new Label("5. Each puzzle has only 1 solution");
+            rule5.setFont(Font.font(16));
+
+            Button gotIt = new Button("Got it!");
+
+            gotIt.setOnAction(actionEvent1 -> rulesStage.close());
+
+            vBox.getChildren().addAll(rules, separator1, rule1, rule2, rule3, rule4, rule5, separator2, gotIt);
+
+            Scene scene = new Scene(vBox);
+            rulesStage.setScene(scene);
+            rulesStage.show();
 
         });
 
@@ -164,9 +202,8 @@ public class Menu extends Application {
             File puzzleFile = fileChooser.showOpenDialog(stage);
             if (puzzleFile != null) {
                 try {
-                    int difficulty = getDifficulty(difficultyBox);
                     if (checkFile(puzzleFile.getPath())) {
-                        Game game = new Game(stage, boardSize, difficulty, puzzleFile.getPath());
+                        new Game(stage, boardSize, puzzleFile.getPath());
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -187,9 +224,8 @@ public class Menu extends Application {
                     FileWriter w = new FileWriter(pathToPuzzle);
                     w.write(textArea.getText());
                     w.close();
-                    int difficulty = getDifficulty(difficultyBox);
                     if (checkFile(pathToPuzzle)) {
-                        Game game = new Game(stage, boardSize, difficulty, pathToPuzzle);
+                        new Game(stage, boardSize, pathToPuzzle);
                         loadFromFileStage.close();
                     }
                 } catch (Exception ex) {
