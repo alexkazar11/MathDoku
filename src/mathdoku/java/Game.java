@@ -213,7 +213,12 @@ public class Game extends Application {
         //Generates a new puzzle
         newBoard.setOnAction(actionEvent -> {
             try {
-                new Generator(stage, boardSize, difficulty);
+                Alert newGameAlert = new Alert(Alert.AlertType.CONFIRMATION,
+                        "WARNING: Generating new game will erase all previous inputs!");
+                Optional<ButtonType> result = newGameAlert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    new Generator(stage, boardSize, difficulty);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
