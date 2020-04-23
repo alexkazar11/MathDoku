@@ -299,7 +299,6 @@ public class Menu extends Application {
                 //Adding all CellIDs from current line to an ArrayList of all CellIDs
                 for (String cellID : cellIDsArray) {
                     allCellIDs.add(Integer.parseInt(cellID));
-                    System.out.println(cellID);
                 }
             }
 
