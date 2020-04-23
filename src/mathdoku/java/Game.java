@@ -260,7 +260,6 @@ public class Game extends Application {
                 if (Arrays.equals(listOfCell.getCoordinates(), chosenXY)) {
                     cell = listOfCell;
                     board.chooseBox(cell);
-                    System.out.println(Arrays.toString(cell.getCoordinates()));
                     break;
                 }
             }

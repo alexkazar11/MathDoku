@@ -867,9 +867,8 @@ public class Board extends Canvas {
     /**
      * Solves the puzzle, then corrects one value that is not correct.
      *
-     * @return true - hint given, false - not given
      */
-    public boolean showHint() {
+    public void showHint() {
 
         //Saves the current values of all Cells to an ArrayList
         ArrayList<CellVal> lastStateOfCells = new ArrayList<>();
@@ -878,7 +877,10 @@ public class Board extends Canvas {
             int value = cell.getValue();
             lastStateOfCells.add(new CellVal(cell, value));
         }
-        clear();
+
+        for (Cell cell : arrayOfCells) {
+            cell.setValue(0);
+        }
 
         //Solves the puzzle and saves the values in another ArrayList
         solve();
@@ -888,7 +890,9 @@ public class Board extends Canvas {
             solvedCells.add(new CellVal(cell, value));
         }
 
-        clear();
+        for (Cell cell : arrayOfCells) {
+            cell.setValue(0);
+        }
 
         //Restore the last state of the Cells
         for (Cell cell : arrayOfCells) {
@@ -907,12 +911,12 @@ public class Board extends Canvas {
                 if (cell.getCellID() == cellVal.getCell().getCellID()
                         && cell.getValue() != cellVal.getValue()) {
                     cell.setValue(cellVal.getValue());
+                    stack.push(new CellVal(cell, cellVal.getValue()));
                     chosenCell = cell;
-                    return true;
+                    return;
                 }
             }
         }
-        return false;
     }
 
     public Cell[] getArrayOfCells() {
