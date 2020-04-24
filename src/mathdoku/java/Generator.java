@@ -198,7 +198,7 @@ public class Generator {
 
         total = 0;
         if (canBeDivided) {
-            multiplier = "÷";
+            multiplier = "\u00f7";
             total = cells.get(0).getValue();
             for (int i = 1; i < cells.size(); i++) {
                 total = total / cells.get(i).getValue();

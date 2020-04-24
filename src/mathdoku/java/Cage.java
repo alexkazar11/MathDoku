@@ -92,7 +92,7 @@ public class Cage {
                 return total == multiplierInt;
             }
 
-            case "÷":
+            case "\u00f7":
             case "/": {
                 int total = 0;
 
